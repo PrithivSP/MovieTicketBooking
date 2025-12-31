@@ -4,6 +4,7 @@ import daos.UserDAOImp
 import daos.interfaces.UserDAO
 import models.User
 import services.interfaces.UserService
+import utils.isValidAge
 import utils.isValidEmailId
 import utils.isValidPassword
 import utils.isValidPhoneNumber
@@ -39,6 +40,10 @@ class UserServiceImp: UserService {
 
         if(!userPassword.isValidPassword()) {
             throw IllegalArgumentException("Password does not meet the required rules")
+        }
+
+        if(!userAge.isValidAge()) {
+            throw IllegalArgumentException("Age should be greater than 3 and less than 120")
         }
 
         val userId = UUID.randomUUID().toString()

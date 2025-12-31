@@ -13,4 +13,4 @@ fun String.isValidPhoneNumber(): Boolean = this.matches(PHONE_PATTERN.toRegex())
 
 fun String.isValidPassword(): Boolean = this.matches(PASSWORD_PATTERN.toRegex())
 
-fun Int.isValidAge(): Boolean = this in MIN_AGE..MAX_AGE
+fun Byte.isValidAge(): Boolean = this in MIN_AGE..MAX_AGE

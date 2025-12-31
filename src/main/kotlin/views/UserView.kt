@@ -25,7 +25,7 @@ class UserView {
     }
 
     fun getAge(): Byte {
-        return readInt("Enter your age: ")
+        return readInt("Enter your age: ").toByte()
     }
 
     fun getLocation(): String {
