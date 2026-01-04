@@ -10,4 +10,7 @@ interface UserDAO {
     fun getUserByPhoneNumber(phoneNumber: String): User?
     fun getUserByEmailId(email: String): User?
 
+
+    fun isEmailAvailable(email: String):Boolean
+    fun isPhoneNumberAvailable(phoneNumber: String): Boolean
 }

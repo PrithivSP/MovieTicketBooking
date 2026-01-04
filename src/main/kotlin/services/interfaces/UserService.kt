@@ -1,5 +1,6 @@
 package services.interfaces
 
+import models.Booking
 import models.User
 
 interface UserService {
@@ -24,6 +25,7 @@ interface UserService {
     fun updateUserLocation(userId: String, newEmail: String)
     fun updateUserPassword(userId: String, newPassword: String)
 
-//    fun getHistory(userId)
+    fun getHistory(userId: String): List<Booking>
+    fun addBookingToUserHistory(userId: String, booking: Booking)
 
 }

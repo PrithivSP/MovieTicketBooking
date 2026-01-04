@@ -1,5 +1,8 @@
 package views
 
+import utils.isValidAge
+import utils.isValidEmailId
+import utils.isValidPhoneNumber
 import utils.readInt
 import utils.readPasswordForLogin
 import utils.readPasswordForSignUp
@@ -26,6 +29,7 @@ class UserView {
 
     fun getAge(): Byte {
         return readInt("Enter your age: ").toByte()
+
     }
 
     fun getLocation(): String {
@@ -34,6 +38,7 @@ class UserView {
 
     fun getEmail(): String {
         return readString("Enter your email: ")
+
     }
 
     fun getPhoneNumber(): String {
@@ -48,8 +53,16 @@ class UserView {
         return readPasswordForLogin("Enter your password: ")
     }
 
+    fun showNoUserLoggedIn() {
+        println("Please Login to continue...")
+    }
+
     fun showSignUpSuccess() {
         println("Signed up successful. Please proceed with login")
+    }
+
+    fun getUpdateMenuChoice(): Int {
+        return readInt("Enter your choice (or 0 to go back): ")
     }
 
     fun showUpdateMenu(name: String?, phoneNumber: String?, email: String?, location: String?) {
@@ -62,10 +75,6 @@ class UserView {
         println("0) Back")
     }
 
-    fun getUpdateMenuChoice(): Int {
-        return readInt("Enter your choice (or 0 to go back): ")
-    }
-
     fun showPasswordDoNotMatch() {
         println("Password do not match. Try again")
     }
@@ -73,6 +82,5 @@ class UserView {
     fun showLoginSuccess(userName: String?) {
         println("Logged in. Welcome $userName!")
     }
-
 
 }

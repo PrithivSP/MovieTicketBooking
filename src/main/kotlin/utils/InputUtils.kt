@@ -1,5 +1,7 @@
 package utils
 
+
+
 fun readInt(prompt: String): Int {
     do {
         print(prompt)
@@ -20,23 +22,27 @@ fun readString(prompt: String): String {
     do {
         print(prompt)
         val input = readln().trim()
-        if (input.isEmpty()) {
+
+        if(input.isEmpty()) {
             println("Input cannot be empty. Please try again")
         } else {
             return input
         }
+
     } while (true)
 }
 
 fun readPasswordForLogin(prompt: String): String {
     do {
         print(prompt)
-        val password = readln().trim()
-        if (password.isEmpty()) {
+        val input = readln().trim()
+
+        if(input.isEmpty()) {
             println("Password cannot be empty. Please try again")
         } else {
-            return password
+            return input
         }
+
     } while (true)
 }
 
@@ -46,7 +52,7 @@ fun readPasswordForSignUp(prompt: String): String {
         val password = readln().trim()
 
         if (password.isEmpty()) {
-            println("Password cannot be empty. Try again")
+            println("Password cannot be empty. Please try again")
             continue
         }
 
@@ -54,7 +60,7 @@ fun readPasswordForSignUp(prompt: String): String {
         val rePassword = readln().trim()
 
         if (rePassword.isEmpty()) {
-            println("Password cannot be empty. Try again")
+            println("Password cannot be empty. Please try again")
             continue
         }
 
@@ -63,5 +69,6 @@ fun readPasswordForSignUp(prompt: String): String {
         } else {
             return password
         }
+
     } while (true)
 }

@@ -4,9 +4,9 @@ class ConsoleView {
     companion object {
 
         fun printHeader(header: String) {
-            println("=====================================")
+            println("\n=====================================")
             println("         $header")
-            println("=====================================")
+            println("=====================================\n")
         }
 
         fun printInvalidOptions() {
@@ -30,7 +30,7 @@ class ConsoleView {
         }
 
         fun printError(errorMessage: String) {
-            println("Error: $")
+            println("Error: $errorMessage")
         }
     }
 }

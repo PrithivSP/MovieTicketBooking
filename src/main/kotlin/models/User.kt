@@ -1,7 +1,7 @@
 package models
 
 class User(
-    var userId: String,
+    val userId: String,
     var userName: String,
     var userEmail: String,
     var userPhoneNumber: String,

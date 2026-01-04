@@ -30,4 +30,8 @@ class UserDAOImp: UserDAO {
         return null
     }
 
+    override fun isEmailAvailable(email: String): Boolean = getUserByEmailId(email) == null
+
+    override fun isPhoneNumberAvailable(phoneNumber: String): Boolean = getUserByPhoneNumber(phoneNumber) == null
+
 }

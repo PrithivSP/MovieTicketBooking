@@ -1,40 +1,62 @@
 package controllers
 
+import controllers.exceptions.AuthenticationException
 import controllers.exceptions.ExitApp
+import controllers.exceptions.ValidationException
 import models.User
+import models.enumerations.AppFlowState
+import services.UserServiceImp
 import services.interfaces.UserService
 import views.ConsoleView
 import views.UserView
 
-class UserController(private val userService: UserService, private val userView: UserView) {
+class UserController(private val userService: UserService = UserServiceImp(), private val userView: UserView = UserView()) {
 
     // authentication
-    fun authentication(): User? {
-        do {
+    fun showAuthenticationMenu(): AppFlowState {
             val authChoice: Int = userView.getAuthChoiceView()
 
-            when(authChoice) {
-                1 -> return login()
-                0, -1 -> throw ExitApp()
-                else -> ConsoleView.printInvalidOptions()
+            return when (authChoice) {
+                1 -> AppFlowState.LOGIN
+                2 -> AppFlowState.SIGNUP
+                0, -1 -> throw ExitApp("Thanks for choosing us...")
+                else -> {
+                    ConsoleView.printInvalidOptions()
+                    AppFlowState.AUTH_MENU
+                }
             }
-        } while (true)
     }
 
     // logging in
-    private fun login(): User? {
+    fun login(): User? {
 
         do {
 
             ConsoleView.printHeader("Login")
             val loginChoice = userView.getLoginChoice()
 
-            when(loginChoice) {
-                1 -> return loginWithPhoneNumber()
-                2 -> return loginWithEmailId()
+            when (loginChoice) {
+                1 -> {
+                    // login with user phone number -> if null user pressed 0
+                    val user = loginWithPhoneNumber()
+                    if (user == null) {
+                        continue
+                    } else {
+                        return user
+                    }
+                }
+                2 -> {
+                    // login with user phone number -> if null user pressed 0
+                    val user = loginWithEmailId()
+                    if (user == null) {
+                        continue
+                    } else {
+                        return user
+                    }
+                }
                 3 -> signUp()
                 0 -> return null
-                -1 -> throw ExitApp()
+                -1 -> throw ExitApp("Thanks for choosing us...")
                 else -> ConsoleView.printInvalidOptions()
             }
         } while (true)
@@ -51,24 +73,32 @@ class UserController(private val userService: UserService, private val userView:
 
             val phoneNumber = userView.getPhoneNumber()
 
-            if(phoneNumber == "0") {
+            if (phoneNumber == "0") {
                 return null
             }
 
             val password = userView.getPasswordForLogin()
-            if(password == "0") {
+            if (password == "0") {
                 return null
             }
 
             try {
                 return userService.loginWithPhoneNumber(phoneNumber, password)
-            } catch (e: IllegalArgumentException) {
+            }
+            catch (e: ValidationException) {
+                ConsoleView.printMessage(e.message.toString())
+            }
+            catch (e: AuthenticationException) {
+                ConsoleView.printMessage(e.message.toString())
+            }
+            catch (e: IllegalArgumentException) {
                 ConsoleView.printError(e.message.toString())
-            } catch (e: Exception) {
-                ConsoleView.printHeader(e.message.toString())
+            }
+            catch (e: Exception) {
+                ConsoleView.printError(e.message.toString())
             }
 
-        }while (true)
+        } while (true)
     }
     private fun loginWithEmailId(): User? {
 
@@ -79,29 +109,37 @@ class UserController(private val userService: UserService, private val userView:
 
             val emailId = userView.getEmail()
 
-            if(emailId == "0") {
+            if (emailId == "0") {
                 return null
             }
 
             val password = userView.getPasswordForLogin()
-            if(password == "0") {
+            if (password == "0") {
                 return null
             }
 
             try {
                 return userService.loginWithEmailId(emailId, password)
-            } catch (e: IllegalArgumentException) {
+            }
+            catch (e: ValidationException) {
+                ConsoleView.printMessage(e.message.toString())
+            }
+            catch (e: AuthenticationException) {
+                ConsoleView.printMessage(e.message.toString())
+            }
+            catch (e: IllegalArgumentException) {
                 ConsoleView.printError(e.message.toString())
-            } catch (e: Exception) {
-                ConsoleView.printHeader(e.message.toString())
+            }
+            catch (e: Exception) {
+                ConsoleView.printMessage(e.message.toString())
             }
 
-        }while (true)
+        } while (true)
     }
 
 
     //sign up
-    private fun signUp() {
+    fun signUp() {
 
         do {
 
@@ -125,9 +163,14 @@ class UserController(private val userService: UserService, private val userView:
                 userService.createUser(name, email, phoneNumber, age, location, password)
                 userView.showSignUpSuccess()
                 return
-            } catch (e: java.lang.IllegalArgumentException) {
+            }
+            catch (e: ValidationException) {
                 ConsoleView.printMessage(e.message.toString())
-            } catch (e: Exception) {
+            }
+            catch (e: IllegalArgumentException) {
+                ConsoleView.printMessage(e.message.toString())
+            }
+            catch (e: Exception) {
                 ConsoleView.printMessage(e.message.toString())
             }
 

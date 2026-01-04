@@ -1,3 +1,3 @@
 package controllers.exceptions
 
-class ExitApp: RuntimeException("Thanks for choosing us...")
+class ExitApp(message: String): RuntimeException(message)
