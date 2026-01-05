@@ -4,6 +4,8 @@ import models.Screen
 import models.Show
 
 interface ShowService {
+
+    fun getShowById(showId: String): Show?
     fun getShowsForMovieTheaterScreen(movieId: String,
                                      theaterId: String,
                                      screenId: String): List<Show>

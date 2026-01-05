@@ -3,6 +3,7 @@ package controllers
 import controllers.exceptions.ExitApp
 import controllers.exceptions.ExitToUserMenu
 import models.Booking
+import models.Movie
 import models.Screen
 import models.Show
 import models.dtos.NavResult
@@ -48,14 +49,20 @@ class AppController {
 
                     AppFlowState.BROWSE_MOVIES -> handleBrowseMovies()
                     AppFlowState.SEARCH_MOVIE -> handleSearchMovie()
+                    AppFlowState.CHANGE_LOCATION -> handleChangeLocation()
+                    AppFlowState.SHOW_HISTORY -> handleShowHistory()
+                    AppFlowState.UPDATE_PROFILE -> handleUpdateUserProfile()
 
                     AppFlowState.SELECT_MOVIE -> handleSelectMovie()
+                    AppFlowState.SELECT_THEATER_FOR_MOVIE -> handleSelectTheaterForMovie()
                     AppFlowState.SELECT_THEATER -> handleSelectTheater()
+                    AppFlowState.SELECT_MOVIE_FOR_THEATER -> handleSelectMovieForTheater()
                     AppFlowState.SELECT_SCREEN -> handleSelectScreen()
                     AppFlowState.SELECT_DATE -> handleSelectDate()
                     AppFlowState.SELECT_TIME -> handleSelectTime()
                     AppFlowState.SELECT_SEATS -> handleSelectSeat()
                     AppFlowState.BOOKING -> handleBooking()
+
                     AppFlowState.EXIT -> AppFlowState.EXIT
 
                 }
@@ -124,7 +131,7 @@ class AppController {
 
         Cache.selectedMovie = searchedMovie
 
-        return AppFlowState.SELECT_THEATER
+        return AppFlowState.SELECT_THEATER_FOR_MOVIE
     }
 
     private fun handleSelectMovie(): AppFlowState {
@@ -137,10 +144,31 @@ class AppController {
 
         Cache.selectedMovie = movie
 
-        return AppFlowState.SELECT_THEATER
+        return AppFlowState.SELECT_THEATER_FOR_MOVIE
+    }
+
+    private fun handleSelectMovieForTheater(): AppFlowState {
+        val selectedTheater = Cache.selectedTheater ?: return AppFlowState.SELECT_THEATER
+
+        val chosenMovie: Movie = movieController.chooseMovieFromTheater(selectedTheater) ?: return AppFlowState.SELECT_THEATER
+
+        Cache.selectedMovie = chosenMovie
+
+        return AppFlowState.SELECT_SCREEN
+
     }
 
     private fun handleSelectTheater(): AppFlowState {
+        val userLocation = Session.currentUser?.userLocation ?: return AppFlowState.AUTH_MENU
+
+        val chosenTheater = theaterController.chooseTheaterNearBy(userLocation) ?: return AppFlowState.USER_MENU
+
+        Cache.selectedTheater = chosenTheater
+
+        return AppFlowState.SELECT_MOVIE_FOR_THEATER
+    }
+
+    private fun handleSelectTheaterForMovie(): AppFlowState {
         val userLocation = Session.currentUser?.userLocation ?: return AppFlowState.AUTH_MENU
 
         val selectedMovie = Cache.selectedMovie ?: return AppFlowState.SELECT_MOVIE
@@ -159,7 +187,7 @@ class AppController {
 
         val selectedMovie = Cache.selectedMovie ?: return AppFlowState.SELECT_MOVIE
 
-        val selectedTheater = Cache.selectedTheater ?: return AppFlowState.SELECT_THEATER
+        val selectedTheater = Cache.selectedTheater ?: return AppFlowState.SELECT_THEATER_FOR_MOVIE
 
         val chosenScreen: Screen =
             theaterController.chooseScreenForMovieAndTheater(selectedMovie, selectedTheater) ?: run {
@@ -174,7 +202,7 @@ class AppController {
     private fun handleSelectDate(): AppFlowState {
 
         val selectedMovie = Cache.selectedMovie ?: return AppFlowState.SELECT_MOVIE
-        val selectedTheater = Cache.selectedTheater ?: return AppFlowState.SELECT_THEATER
+        val selectedTheater = Cache.selectedTheater ?: return AppFlowState.SELECT_THEATER_FOR_MOVIE
         val chosenScreen: Screen = Cache.selectedScreen ?: return AppFlowState.SELECT_SCREEN
 
         val shows: List<Show> = showController.getShows(selectedMovie, selectedTheater, chosenScreen)
@@ -195,7 +223,7 @@ class AppController {
     private fun handleSelectTime(): AppFlowState {
 
         val selectedMovie = Cache.selectedMovie ?: return AppFlowState.SELECT_MOVIE
-        val selectedTheater = Cache.selectedTheater ?: return AppFlowState.SELECT_THEATER
+        val selectedTheater = Cache.selectedTheater ?: return AppFlowState.SELECT_THEATER_FOR_MOVIE
         val selectedScreen = Cache.selectedScreen ?: return AppFlowState.SELECT_SCREEN
         val selectedDate = Cache.selectedDate ?: return AppFlowState.SELECT_DATE
 
@@ -237,7 +265,8 @@ class AppController {
     }
 
     private fun handleBooking(): AppFlowState {
-        val selectedTheater = Cache.selectedTheater ?: return AppFlowState.SELECT_THEATER
+        val selectedMovie = Cache.selectedMovie ?: return AppFlowState.SELECT_MOVIE
+        val selectedTheater = Cache.selectedTheater ?: return AppFlowState.SELECT_THEATER_FOR_MOVIE
         val selectedScreen = Cache.selectedScreen ?: return AppFlowState.SELECT_SCREEN
         val selectedShow: Show = Cache.selectedShow ?: return AppFlowState.SELECT_TIME
         val selectedSeatSnapShots = if (Cache.selectedSeatSnapShots.isEmpty()) {
@@ -249,6 +278,7 @@ class AppController {
         val userId: String = Session.currentUser?.userId ?: return AppFlowState.AUTH_MENU
         val booked: Booking? = bookingController.proceedBooking(
             userId,
+            selectedMovie.movieId,
             selectedTheater.theaterId,
             selectedScreen.screenId,
             selectedShow.showId,
@@ -261,6 +291,28 @@ class AppController {
         }
         return AppFlowState.USER_MENU
     }
+
+    private fun handleChangeLocation(): AppFlowState {
+        val userId = Session.currentUser?.userId ?: return AppFlowState.AUTH_MENU
+
+        userController.changeUserLocation(userId)
+
+        return AppFlowState.USER_MENU
+    }
+
+    private fun handleShowHistory(): AppFlowState {
+        val userId = Session.currentUser?.userId ?: return AppFlowState.AUTH_MENU
+
+        bookingController.showHistory(userId)
+
+        return AppFlowState.USER_MENU
+    }
+
+    private fun handleUpdateUserProfile(): AppFlowState {
+
+        return AppFlowState.USER_MENU
+    }
+
 
 
 }

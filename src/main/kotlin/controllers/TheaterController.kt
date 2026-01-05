@@ -73,11 +73,8 @@ class TheaterController(
         } while (true)
     }
 
-
-
-    fun proceedWithScreenAndShowSelection(chosenMovie: Movie, chosenTheater: Theater) {
-        val chosenScreen = chooseScreenForMovieAndTheater(chosenMovie, chosenTheater) ?: return
-
-
+    fun chooseTheaterNearBy(userLocation: String): Theater? {
+        val theatersNearBy = theaterService.getTheatersNearBy(userLocation)
+        return chooseTheaterFromList(theatersNearBy)
     }
 }

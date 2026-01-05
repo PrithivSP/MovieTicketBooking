@@ -1,6 +1,7 @@
 package controllers
 
 import models.Movie
+import models.Theater
 import services.MovieServiceImp
 import services.interfaces.MovieService
 import views.ConsoleView
@@ -73,6 +74,11 @@ class MovieController(
                 return selectedMovie
             }
         } while (true)
+    }
+
+    fun chooseMovieFromTheater(theater: Theater): Movie? {
+        val movieList = movieService.getMoviesForTheater(theater.movies)
+        return chooseMovieFromList(movieList)
     }
 
 }

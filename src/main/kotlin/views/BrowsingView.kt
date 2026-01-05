@@ -10,7 +10,7 @@ class BrowsingView {
         println("2. Browse movie by name")
         println("3. Browse near by theaters")
         println("4. Change location")
-        println("5. Show booking History")
+        println("5. Show booking history")
         println("6. Cancel a booking")
         println("7. Update profile")
         println("0. Logout")

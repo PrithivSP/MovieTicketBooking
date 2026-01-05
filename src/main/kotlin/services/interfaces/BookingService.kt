@@ -13,6 +13,7 @@ import java.util.UUID
 
 interface BookingService {
     fun creatingBooking(userId: String,
+                        movieId: String,
                         theaterId: String,
                         screenId: String,
                         showId: String,
@@ -27,7 +28,7 @@ interface BookingService {
 
     fun getCancellableBookings(userId: String) : List<Booking>
 
-//    fun getBookingDisplaySummary(booking: Booking): BookingDisplay
+    fun getBookingDisplaySummary(booking: Booking): BookingDisplay
 
 //    fun releaseSeatAndUpdateBooking(booking: Booking, requestedSeats: Set<String>): Booking
 

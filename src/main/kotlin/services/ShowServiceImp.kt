@@ -8,6 +8,10 @@ import services.interfaces.ShowService
 import kotlin.collections.contains
 
 class ShowServiceImp(private val showDAO: ShowDAO = ShowDAOImp()): ShowService {
+    override fun getShowById(showId: String): Show? {
+        return showDAO.getShowById(showId)
+    }
+
     override fun getShowsForMovieTheaterScreen(
         movieId: String,
         theaterId: String,

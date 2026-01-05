@@ -22,7 +22,7 @@ interface UserService {
     fun updateUserName(userId: String, newName: String)
     fun updateUserEmail(userId: String, newEmail: String)
     fun updateUserPhoneNumber(userId: String, newPhoneNumber: String)
-    fun updateUserLocation(userId: String, newEmail: String)
+    fun updateUserLocation(userId: String, newLocation: String)
     fun updateUserPassword(userId: String, newPassword: String)
 
     fun getHistory(userId: String): List<Booking>

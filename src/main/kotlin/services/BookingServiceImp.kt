@@ -14,18 +14,22 @@ import models.dtos.BookingDisplay
 import models.enumerations.BookingStatus
 import services.interfaces.BookingService
 import services.interfaces.MovieService
+import services.interfaces.ShowService
 import services.interfaces.TheaterService
 import java.time.LocalDateTime
 import java.util.UUID
+import kotlin.concurrent.thread
 
 class BookingServiceImp(private val bookingDAO: BookingDAO = BookingDAOImp(),
-    private val userDAO: UserDAO = UserDAOImp(),
-    private val theaterDAO: TheaterDAO = TheaterDAOImp(),
-            private val theaterService: TheaterService = TheaterServiceImp(),
-            private val movieService: MovieService = MovieServiceImp()
+                        private val userDAO: UserDAO = UserDAOImp(),
+                        private val theaterDAO: TheaterDAO = TheaterDAOImp(),
+                        private val theaterService: TheaterService = TheaterServiceImp(),
+                        private val showService: ShowService = ShowServiceImp(),
+                        private val movieService: MovieService = MovieServiceImp()
 
 ): BookingService {
     override fun creatingBooking(userId: String,
+                                 movieId: String,
                         theaterId: String,
                         screenId: String,
                         showId: String,
@@ -38,6 +42,7 @@ class BookingServiceImp(private val bookingDAO: BookingDAO = BookingDAOImp(),
         val bookingId = UUID.randomUUID().toString()
 
         val book: Booking = Booking(bookingId,
+            movieId,
             userId,
             theaterId,
             screenId,
@@ -72,9 +77,15 @@ class BookingServiceImp(private val bookingDAO: BookingDAO = BookingDAOImp(),
             }
     }
 
-//    override fun getBookingDisplaySummary(booking: Booking): BookingDisplay {
-//        TODO("Not yet implemented")
-//    }
+    override fun getBookingDisplaySummary(booking: Booking): BookingDisplay {
+        val booked = bookingDAO.getBookingById(booking.bookingId) ?: booking
+        val theater = theaterService.getTheaterById(booking.theaterId)
+        val screen = theaterService.getScreenById(booking.theaterId, booking.screenId)
+        val movie = movieService.getMovieById(booking.movieId)
+        val show = showService.getShowById(booking.showId)
+
+        return BookingDisplay(booked, theater, screen, movie, show)
+    }
 
 //    override fun releaseSeatAndUpdateBooking(
 //        booking: Booking,

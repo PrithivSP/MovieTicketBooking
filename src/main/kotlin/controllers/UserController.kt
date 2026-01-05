@@ -140,7 +140,6 @@ class UserController(
         }
     }
 
-
     //sign up
     fun signUp(): NavResult<Unit> {
 
@@ -202,6 +201,20 @@ class UserController(
             }
 
         } while (true)
+
+    }
+
+    fun changeUserLocation(userID: String) {
+        val newUserLocation = userView.getLocation()
+
+        when(newUserLocation) {
+            NavResult.Back -> return
+            NavResult.Exit -> return
+            NavResult.Retry -> return
+            is NavResult.Result -> {
+                userService.updateUserLocation(userID, newUserLocation.result)
+            }
+        }
 
     }
 

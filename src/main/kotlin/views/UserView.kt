@@ -1,5 +1,7 @@
 package views
 
+import models.Booking
+import models.dtos.BookingDisplay
 import models.dtos.NavResult
 import utils.isValidAge
 import utils.isValidEmailId
@@ -75,7 +77,6 @@ class UserView {
             else -> NavResult.Result(location)
         }
     }
-
 
     fun getEmail(): NavResult<String> {
 
@@ -160,6 +161,10 @@ class UserView {
 
     fun showLoginSuccess(userName: String?) {
         println("Logged in. Welcome $userName!")
+    }
+
+    fun showNoBookingsFound() {
+        println("\nNo bookings found for this user")
     }
 
 }

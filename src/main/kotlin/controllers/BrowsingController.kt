@@ -14,6 +14,9 @@ class BrowsingController(
         return when (userMenuChoice) {
             1 -> AppFlowState.BROWSE_MOVIES
             2 -> AppFlowState.SEARCH_MOVIE
+            3 -> AppFlowState.SELECT_THEATER
+            4 -> AppFlowState.CHANGE_LOCATION
+            5 -> AppFlowState.SHOW_HISTORY
             0, -1 -> AppFlowState.AUTH_MENU
             else -> {
                 ConsoleView.printInvalidOptions()
