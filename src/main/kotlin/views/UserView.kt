@@ -1,10 +1,12 @@
 package views
 
 import models.Booking
+import models.User
 import models.dtos.BookingDisplay
 import models.dtos.NavResult
 import utils.isValidAge
 import utils.isValidEmailId
+import utils.isValidPassword
 import utils.isValidPhoneNumber
 import utils.readInt
 import utils.readPasswordForLogin
@@ -133,34 +135,47 @@ class UserView {
         }
     }
 
+    fun getCurrentPassword(): NavResult<String> {
+        val password = readPasswordForLogin("\nEnter your current password: ")
+        return when {
+            password == "-1" -> NavResult.Exit
+            password == "0" -> NavResult.Back
+            else -> NavResult.Result(password)
+        }
+    }
+
     fun showSignUpSuccess() {
-        println("Signed up successful. Please proceed with login")
+        println("\nSigned up successful. Please proceed with login")
     }
 
     fun showNoUserLoggedIn() {
         println("Please Login to continue...")
     }
 
-    fun getUpdateMenuChoice(): Int {
-        return readInt("Enter your choice (or 0 to go back): ")
-    }
-
-    fun showUpdateMenu(name: String?, phoneNumber: String?, email: String?, location: String?) {
+    fun showUpdateMenuAndGetChoice(user: User): NavResult<Int> {
         println("Current details:")
-        println("1) Name     : $name")
-        println("2) Phone    : $phoneNumber")
-        println("3) Email    : $email")
-        println("4) Location : $location")
+        println("1) Name     : ${user.userName}")
+        println("2) Phone    : ${user.userPhoneNumber}")
+        println("3) Email    : ${user.userEmail}")
+        println("4) Location : ${user.userLocation}")
         println("5) Change Password")
         println("0) Back")
+
+        val input = readInt("Enter your choice (or 0 to go back): ")
+
+        return when {
+            input == -1 -> NavResult.Exit
+            input == 0 -> NavResult.Back
+            else -> NavResult.Result(input)
+        }
     }
 
     fun showPasswordDoNotMatch() {
-        println("Password do not match. Try again")
+        println("\nPassword do not match. Try again")
     }
 
     fun showLoginSuccess(userName: String?) {
-        println("Logged in. Welcome $userName!")
+        println("\nLogged in. Welcome $userName!")
     }
 
     fun showNoBookingsFound() {

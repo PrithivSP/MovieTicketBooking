@@ -98,14 +98,16 @@ class UserServiceImp(private val bookingDAO: BookingDAO = BookingDAOImp(), priva
     }
 
     override fun updateUserName(userId: String, newName: String) {
-        TODO("Not yet implemented")
+        userDAO.getUserById(userId)?.userName = newName
     }
 
     override fun updateUserEmail(userId: String, newEmail: String) {
+        userDAO.getUserById(userId)?.userEmail = newEmail
         TODO("Not yet implemented")
     }
 
     override fun updateUserPhoneNumber(userId: String, newPhoneNumber: String) {
+        userDAO.getUserById(userId)?.userPhoneNumber = newPhoneNumber
         TODO("Not yet implemented")
     }
 
@@ -114,7 +116,7 @@ class UserServiceImp(private val bookingDAO: BookingDAO = BookingDAOImp(), priva
     }
 
     override fun updateUserPassword(userId: String, newPassword: String) {
-        TODO("Not yet implemented")
+       userDAO.getUserById(userId)?.changePassword(newPassword)
     }
 
     override fun getHistory(userId: String): List<Booking> {

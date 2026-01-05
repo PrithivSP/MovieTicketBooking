@@ -28,8 +28,6 @@ internal object DataStore {
 
     private fun addSampleData() {
 
-        println("Loading sample data...")
-
         /* ================= USERS ================= */
         val u1 = User(
             UUID.randomUUID().toString(),
@@ -169,8 +167,6 @@ internal object DataStore {
                 }
             }
         }
-
-        println("Sample Data loaded")
     }
 
 }

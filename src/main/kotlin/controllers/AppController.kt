@@ -95,6 +95,7 @@ class AppController {
             is NavResult.Result -> {
                 val user = result.result ?: return AppFlowState.LOGIN
                 Session.login(user)
+                userView.showLoginSuccess(user.userName)
                 AppFlowState.USER_MENU
             }
         }
@@ -112,8 +113,10 @@ class AppController {
             NavResult.Retry ->
                 AppFlowState.SIGNUP
 
-            is NavResult.Result ->
+            is NavResult.Result -> {
+                userView.showSignUpSuccess()
                 AppFlowState.AUTH_MENU
+            }
         }
     }
 
@@ -309,10 +312,13 @@ class AppController {
     }
 
     private fun handleUpdateUserProfile(): AppFlowState {
-
-        return AppFlowState.USER_MENU
+        val user = Session.currentUser ?: return AppFlowState.AUTH_MENU
+        return when (userController.updateUserProfile(user)) {
+            NavResult.Back -> AppFlowState.USER_MENU
+            NavResult.Exit -> AppFlowState.USER_MENU
+            NavResult.Retry -> AppFlowState.UPDATE_PROFILE
+            is NavResult.Result<*> -> AppFlowState.USER_MENU
+        }
     }
-
-
 
 }
