@@ -1,9 +1,11 @@
 package controllers
 
 import controllers.exceptions.ExitApp
+import controllers.exceptions.ExitToUserMenu
 import models.Booking
 import models.Screen
 import models.Show
+import models.dtos.NavResult
 import models.enumerations.AppFlowState
 import services.BookingServiceImp
 import services.UserServiceImp
@@ -35,29 +37,32 @@ class AppController {
 
 
     fun start() {
-
         do {
+            try {
+                currentFlowState = when (currentFlowState) {
+                    AppFlowState.AUTH_MENU -> handleAuthMenu()
+                    AppFlowState.LOGIN -> handleLogin()
+                    AppFlowState.SIGNUP -> handleSignUp()
 
-            currentFlowState = when (currentFlowState) {
-                AppFlowState.AUTH_MENU -> handleAuthMenu()
-                AppFlowState.LOGIN -> handleLogin()
-                AppFlowState.SIGNUP -> handleSignUp()
+                    AppFlowState.USER_MENU -> handleUserMenu()
 
-                AppFlowState.USER_MENU -> handleUserMenu()
+                    AppFlowState.BROWSE_MOVIES -> handleBrowseMovies()
+                    AppFlowState.SEARCH_MOVIE -> handleSearchMovie()
 
-                AppFlowState.BROWSE_MOVIES -> handleBrowseMovies()
-                AppFlowState.SEARCH_MOVIE -> handleSearchMovie()
+                    AppFlowState.SELECT_MOVIE -> handleSelectMovie()
+                    AppFlowState.SELECT_THEATER -> handleSelectTheater()
+                    AppFlowState.SELECT_SCREEN -> handleSelectScreen()
+                    AppFlowState.SELECT_DATE -> handleSelectDate()
+                    AppFlowState.SELECT_TIME -> handleSelectTime()
+                    AppFlowState.SELECT_SEATS -> handleSelectSeat()
+                    AppFlowState.BOOKING -> handleBooking()
+                    AppFlowState.EXIT -> AppFlowState.EXIT
 
-                AppFlowState.SELECT_MOVIE -> handleSelectMovie()
-                AppFlowState.SELECT_THEATER -> handleSelectTheater()
-                AppFlowState.SELECT_SCREEN -> handleSelectScreen()
-                AppFlowState.SELECT_DATE -> handleSelectDate()
-                AppFlowState.SELECT_TIME -> handleSelectTime()
-                AppFlowState.SELECT_SEATS -> handleSelectSeat()
-                AppFlowState.BOOKING -> handleBooking()
-
-                AppFlowState.EXIT -> AppFlowState.EXIT
-
+                }
+            } catch (e: ExitApp) {
+                currentFlowState = AppFlowState.AUTH_MENU
+            } catch (e: ExitToUserMenu) {
+                currentFlowState = AppFlowState.USER_MENU
             }
 
         } while (currentFlowState != AppFlowState.EXIT)
@@ -69,35 +74,39 @@ class AppController {
     private fun handleAuthMenu(): AppFlowState {
         return try {
             userController.showAuthenticationMenu()
-        } catch (_: ExitApp) {
-            AppFlowState.EXIT
+        } catch (e: ExitToUserMenu) {
+            AppFlowState.AUTH_MENU
         }
-
     }
 
     private fun handleLogin(): AppFlowState {
-        return try {
-            val user = userController.login()
+        return when(val result = userController.login()) {
+            NavResult.Back -> AppFlowState.AUTH_MENU
+            NavResult.Exit -> AppFlowState.EXIT
+            NavResult.Retry -> AppFlowState.LOGIN
 
-            if (user != null) {
-                println("Logging in...")
+            is NavResult.Result -> {
+                val user = result.result ?: return AppFlowState.LOGIN
                 Session.login(user)
                 AppFlowState.USER_MENU
-
-            } else {
-                AppFlowState.AUTH_MENU
             }
-        } catch (_: ExitApp) {
-            AppFlowState.EXIT
         }
     }
 
     private fun handleSignUp(): AppFlowState {
-        return try {
-            userController.signUp()
-            AppFlowState.AUTH_MENU
-        } catch (_: ExitApp) {
-            AppFlowState.EXIT
+        return when (val result = userController.signUp()) {
+
+            NavResult.Back ->
+                AppFlowState.AUTH_MENU
+
+            NavResult.Exit ->
+                AppFlowState.EXIT
+
+            NavResult.Retry ->
+                AppFlowState.SIGNUP
+
+            is NavResult.Result ->
+                AppFlowState.AUTH_MENU
         }
     }
 
@@ -200,7 +209,7 @@ class AppController {
         val selectedTime =
             showController.chooseTimeForShowAndDate(shows, selectedDate) ?: return AppFlowState.SELECT_DATE
 
-        val selectedShow = showController.deriveShow(shows, selectedDate, selectedTime)
+        val selectedShow = showController.deriveShow(shows, selectedDate, selectedTime) ?: return AppFlowState.SELECT_TIME
 
         Cache.selectedTime = selectedTime
         Cache.selectedShow = selectedShow

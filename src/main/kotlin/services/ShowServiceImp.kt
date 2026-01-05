@@ -41,7 +41,7 @@ class ShowServiceImp(private val showDAO: ShowDAO = ShowDAOImp()): ShowService {
         for (seat in requestedSeats) {
             val mapped = show.seats[seat]
             if(mapped != null) {
-                alreadyBookedSeats.add(mapped)
+                alreadyBookedSeats.add(seat)
             }
         }
 

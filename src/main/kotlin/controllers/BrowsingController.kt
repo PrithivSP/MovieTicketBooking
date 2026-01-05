@@ -9,7 +9,6 @@ class BrowsingController(
 ) {
 
     fun userMenu(): AppFlowState {
-        ConsoleView.printHeader("User Menu")
         val userMenuChoice = browsingView.getUserMenuChoice()
 
         return when (userMenuChoice) {

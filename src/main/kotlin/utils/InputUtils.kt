@@ -1,5 +1,6 @@
 package utils
 
+import controllers.exceptions.ExitToUserMenu
 
 
 fun readInt(prompt: String): Int {
@@ -9,6 +10,8 @@ fun readInt(prompt: String): Int {
             val input = readln().trim()
             if (input.isEmpty()) {
                 println("Input cannot be empty. Please try again")
+            } else if(input.toInt() == -1) {
+                throw ExitToUserMenu()
             } else {
                 return input.toInt()
             }

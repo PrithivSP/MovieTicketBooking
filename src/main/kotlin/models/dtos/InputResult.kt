@@ -1,9 +1,9 @@
 package models.dtos
 
 sealed class NavResult<out T> {
-    object Back: NavResult<Unit>()
+    object Back: NavResult<Nothing>()
     object Exit: NavResult<Nothing>()
-    object Retry: NavResult<Unit>()
+    object Retry: NavResult<Nothing>()
 
     data class Result<T>(val result: T): NavResult<T>()
 }

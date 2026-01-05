@@ -1,176 +1,203 @@
 package controllers
 
-import controllers.exceptions.AuthenticationException
-import controllers.exceptions.ExitApp
 import controllers.exceptions.ValidationException
 import models.User
+import models.dtos.NavResult
 import models.enumerations.AppFlowState
 import services.UserServiceImp
 import services.interfaces.UserService
 import views.ConsoleView
 import views.UserView
 
-class UserController(private val userService: UserService = UserServiceImp(), private val userView: UserView = UserView()) {
+class UserController(
+    private val userService: UserService = UserServiceImp(),
+    private val userView: UserView = UserView()
+) {
 
     // authentication
     fun showAuthenticationMenu(): AppFlowState {
-            val authChoice: Int = userView.getAuthChoiceView()
 
-            return when (authChoice) {
+        ConsoleView.printHeader("Movie Ticket Booking App")
+        val authChoice: NavResult<Int> = userView.getAuthChoiceView()
+
+        return when (authChoice) {
+            NavResult.Back -> AppFlowState.AUTH_MENU
+
+            NavResult.Exit -> AppFlowState.EXIT
+
+            NavResult.Retry -> AppFlowState.AUTH_MENU
+
+            is NavResult.Result -> when (authChoice.result) {
                 1 -> AppFlowState.LOGIN
                 2 -> AppFlowState.SIGNUP
-                0, -1 -> throw ExitApp("Thanks for choosing us...")
-                else -> {
-                    ConsoleView.printInvalidOptions()
-                    AppFlowState.AUTH_MENU
-                }
+                0 -> AppFlowState.EXIT
+                else -> AppFlowState.AUTH_MENU
             }
+        }
     }
 
     // logging in
-    fun login(): User? {
+    fun login(): NavResult<User?> {
 
-        do {
-
+        do{
             ConsoleView.printHeader("Login")
-            val loginChoice = userView.getLoginChoice()
 
-            when (loginChoice) {
-                1 -> {
-                    // login with user phone number -> if null user pressed 0
-                    val user = loginWithPhoneNumber()
-                    if (user == null) {
-                        continue
-                    } else {
-                        return user
+            when(val choice = userView.getLoginChoice()) {
+                NavResult.Back -> return NavResult.Back
+                NavResult.Exit -> return NavResult.Exit
+                NavResult.Retry -> continue
+
+                is NavResult.Result -> {
+                    return when (choice.result) {
+                        1 -> {
+                            val result = loginWithPhoneNumber()
+                            if(result == NavResult.Back) {
+                                continue
+                            } else {
+                                result
+                            }
+                        }
+                        2 ->
+                        {
+                            val result = loginWithEmailId()
+                            if(result == NavResult.Back) {
+                                continue
+                            } else {
+                                result
+                            }
+                        }
+
+                        else -> NavResult.Retry
                     }
                 }
-                2 -> {
-                    // login with user phone number -> if null user pressed 0
-                    val user = loginWithEmailId()
-                    if (user == null) {
-                        continue
-                    } else {
-                        return user
-                    }
-                }
-                3 -> signUp()
-                0 -> return null
-                -1 -> throw ExitApp("Thanks for choosing us...")
-                else -> ConsoleView.printInvalidOptions()
             }
         } while (true)
 
     }
 
     // login methods
-    private fun loginWithPhoneNumber(): User? {
+    private fun loginWithPhoneNumber(): NavResult<User?> {
 
-        do {
+        ConsoleView.printHeader("Login with Phone Number")
 
-            ConsoleView.printHeader("Login With Phone Number")
-            ConsoleView.printGoBackMessage()
+        when(val phone = userView.getPhoneNumber()) {
+            NavResult.Back -> return NavResult.Back
+            NavResult.Exit -> return NavResult.Exit
+            NavResult.Retry -> return NavResult.Retry
 
-            val phoneNumber = userView.getPhoneNumber()
+            is NavResult.Result -> {
+                when(val password = userView.getPasswordForLogin()) {
+                    NavResult.Back -> return NavResult.Back
+                    NavResult.Exit -> return NavResult.Exit
+                    NavResult.Retry -> return NavResult.Retry
 
-            if (phoneNumber == "0") {
-                return null
+                    is NavResult.Result -> {
+                        return try {
+                            NavResult.Result(
+                                userService.loginWithPhoneNumber(
+                                    phone.result,
+                                    password.result
+                                )
+                            )
+                        } catch (e: Exception) {
+                            ConsoleView.printMessage(e.message ?: "Login failed")
+                            NavResult.Retry
+                        }
+                    }
+                }
             }
-
-            val password = userView.getPasswordForLogin()
-            if (password == "0") {
-                return null
-            }
-
-            try {
-                return userService.loginWithPhoneNumber(phoneNumber, password)
-            }
-            catch (e: ValidationException) {
-                ConsoleView.printMessage(e.message.toString())
-            }
-            catch (e: AuthenticationException) {
-                ConsoleView.printMessage(e.message.toString())
-            }
-            catch (e: IllegalArgumentException) {
-                ConsoleView.printError(e.message.toString())
-            }
-            catch (e: Exception) {
-                ConsoleView.printError(e.message.toString())
-            }
-
-        } while (true)
+        }
     }
-    private fun loginWithEmailId(): User? {
 
-        do {
+    private fun loginWithEmailId(): NavResult<User?> {
+        ConsoleView.printHeader("Login with Email ID")
+        when (val email = userView.getEmail()) {
+            NavResult.Back -> return NavResult.Back
+            NavResult.Exit -> return NavResult.Exit
+            NavResult.Retry -> return NavResult.Retry
 
-            ConsoleView.printHeader("Login With Email ID")
-            ConsoleView.printGoBackMessage()
+            is NavResult.Result -> {
+                when (val password = userView.getPasswordForLogin()) {
+                    NavResult.Back -> return NavResult.Back
+                    NavResult.Exit -> return NavResult.Exit
+                    NavResult.Retry -> return NavResult.Retry
 
-            val emailId = userView.getEmail()
-
-            if (emailId == "0") {
-                return null
+                    is NavResult.Result -> {
+                        return try {
+                            NavResult.Result(
+                                userService.loginWithEmailId(
+                                    email.result,
+                                    password.result
+                                )
+                            )
+                        } catch (e: Exception) {
+                            ConsoleView.printMessage(e.message ?: "Login failed")
+                            NavResult.Retry
+                        }
+                    }
+                }
             }
-
-            val password = userView.getPasswordForLogin()
-            if (password == "0") {
-                return null
-            }
-
-            try {
-                return userService.loginWithEmailId(emailId, password)
-            }
-            catch (e: ValidationException) {
-                ConsoleView.printMessage(e.message.toString())
-            }
-            catch (e: AuthenticationException) {
-                ConsoleView.printMessage(e.message.toString())
-            }
-            catch (e: IllegalArgumentException) {
-                ConsoleView.printError(e.message.toString())
-            }
-            catch (e: Exception) {
-                ConsoleView.printMessage(e.message.toString())
-            }
-
-        } while (true)
+        }
     }
 
 
     //sign up
-    fun signUp() {
+    fun signUp(): NavResult<Unit> {
 
         do {
 
             ConsoleView.printHeader("Sign Up")
             ConsoleView.printGoBackMessage()
 
-            val name = userView.getName()
-            if (name == "0") return
-            val age = userView.getAge()
-            if (age == 0.toByte()) return
-            val email = userView.getEmail()
-            if (email == "0") return
-            val phoneNumber = userView.getPhoneNumber()
-            if (phoneNumber == "0") return
-            val location = userView.getLocation()
-            if (location == "0") return
-            val password = userView.getPasswordForSignUp()
-            if (password == "0") return
+            val name = when (val r = userView.getName()) {
+                NavResult.Back -> return NavResult.Back
+                NavResult.Exit -> return NavResult.Exit
+                NavResult.Retry -> continue
+                is NavResult.Result -> r.result
+            }
+            val age = when (val r = userView.getAge()) {
+                NavResult.Back -> return NavResult.Back
+                NavResult.Exit -> return NavResult.Exit
+                NavResult.Retry -> continue
+                is NavResult.Result -> r.result
+            }
+
+            val email = when (val r = userView.getEmail()) {
+                NavResult.Back -> return NavResult.Back
+                NavResult.Exit -> return NavResult.Exit
+                NavResult.Retry -> continue
+                is NavResult.Result -> r.result
+            }
+
+            val phoneNumber = when (val r = userView.getPhoneNumber()) {
+                NavResult.Back -> return NavResult.Back
+                NavResult.Exit -> return NavResult.Exit
+                NavResult.Retry -> continue
+                is NavResult.Result -> r.result
+            }
+            val location = when (val r = userView.getLocation()) {
+                NavResult.Back -> return NavResult.Back
+                NavResult.Exit -> return NavResult.Exit
+                NavResult.Retry -> continue
+                is NavResult.Result -> r.result
+            }
+
+            val password = when (val r = userView.getPasswordForSignUp()) {
+                NavResult.Back -> return NavResult.Back
+                NavResult.Exit -> return NavResult.Exit
+                NavResult.Retry -> continue
+                is NavResult.Result -> r.result
+            }
 
             try {
                 userService.createUser(name, email, phoneNumber, age, location, password)
                 userView.showSignUpSuccess()
-                return
-            }
-            catch (e: ValidationException) {
+                return NavResult.Result(Unit)
+            } catch (e: ValidationException) {
                 ConsoleView.printMessage(e.message.toString())
-            }
-            catch (e: IllegalArgumentException) {
+            } catch (e: IllegalArgumentException) {
                 ConsoleView.printMessage(e.message.toString())
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 ConsoleView.printMessage(e.message.toString())
             }
 

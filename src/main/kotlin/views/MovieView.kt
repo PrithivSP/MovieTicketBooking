@@ -6,9 +6,9 @@ import utils.readString
 
 class MovieView {
     fun showMoviesAndGetChoice(movies: List<Movie>): Int {
-        val index = 1
+        var index = 1
         for(movie in movies) {
-            println("$index) ${movie.movieName} | ${movie.getPrintableGenres()} | ${movie.movieDuration} | ${movie.movieLanguage} | ${movie.movieType.type}");
+            println("${index++}) ${movie.movieName} | ${movie.getPrintableGenres()} | ${movie.movieDuration} | ${movie.movieLanguage} | ${movie.movieType.type}");
         }
         return readInt("Enter your movie choice (or 0 to go back): ")
     }

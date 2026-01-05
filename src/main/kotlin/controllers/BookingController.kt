@@ -30,7 +30,7 @@ class BookingController(
         try {
             val booking = bookingService.creatingBooking(userId, theaterId, screenId, showId, seatSnapShots, listOf(), BookingStatus.BOOKED, price,
                 LocalDateTime.now(), null)
-            val userId = Session.currentUser?.userId ?: throw AuthenticationException("No user is found. Please login")
+
             userService.addBookingToUserHistory(userId, booking)
             bookingView.showBookingSuccess()
             return booking

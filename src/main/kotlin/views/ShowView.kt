@@ -107,7 +107,7 @@ class ShowView() {
     }
 
     fun showInvalidSeats(invalidSeats: Set<String>) {
-        print("Invalid Seats: ${invalidSeats.joinToString(", ")}")
+        println("Invalid Seats: ${invalidSeats.joinToString(", ")}")
     }
 
     fun showAlreadyBookedSeats(seats: Set<String>) {
