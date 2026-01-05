@@ -220,20 +220,13 @@ class UserController(
     }
 
     // updateUserProfile
-
     fun updateUserProfile(user: User): NavResult<Unit> {
         ConsoleView.printHeader("Update Profile")
         val choice = userView.showUpdateMenuAndGetChoice(user)
 
         return when(choice) {
-
-            NavResult.Back -> NavResult.Back
-            NavResult.Exit -> NavResult.Exit
-            NavResult.Retry -> NavResult.Retry
-
             is NavResult.Result -> {
                 when(choice.result) {
-
                     1 -> {
                         val newName = when (val r = userView.getName()) {
                             NavResult.Back -> return NavResult.Back
@@ -243,7 +236,6 @@ class UserController(
                         }
                         userService.updateUserName(user.userId, newName)
                     }
-
                     2 -> {
                         val newPhoneNumber = when (val r = userView.getPhoneNumber()) {
                             NavResult.Back -> return NavResult.Back
@@ -253,7 +245,6 @@ class UserController(
                         }
                         userService.updateUserPhoneNumber(user.userId, newPhoneNumber)
                     }
-
                     3 -> {
                         val newEmail = when (val r = userView.getEmail()) {
                             NavResult.Back -> return NavResult.Back
@@ -264,11 +255,9 @@ class UserController(
 
                         userService.updateUserEmail(user.userId, newEmail)
                     }
-
                     4 -> {
                         changeUserLocation(user.userId)
                     }
-
                     5 -> {
                         val oldPassword = when (val r = userView.getCurrentPassword()) {
                             NavResult.Back -> return NavResult.Back
@@ -294,6 +283,9 @@ class UserController(
                 }
                 NavResult.Back
             }
+            NavResult.Back -> NavResult.Back
+            NavResult.Exit -> NavResult.Exit
+            NavResult.Retry -> NavResult.Retry
         }
     }
 

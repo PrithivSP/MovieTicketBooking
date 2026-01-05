@@ -47,8 +47,8 @@ class BookingServiceImp(private val bookingDAO: BookingDAO = BookingDAOImp(),
             theaterId,
             screenId,
             showId,
-            seatSnapShots,
-            cancelSeat,
+            seatSnapShots.toMutableSet(),
+            cancelSeat.toMutableSet(),
             bookingStatus,
             bookingPrice,
             bookingCreatedAt,
@@ -87,12 +87,38 @@ class BookingServiceImp(private val bookingDAO: BookingDAO = BookingDAOImp(),
         return BookingDisplay(booked, theater, screen, movie, show)
     }
 
-//    override fun releaseSeatAndUpdateBooking(
-//        booking: Booking,
-//        requestedSeats: Set<String>
-//    ): Booking {
-//        TODO("Not yet implemented")
-//    }
+    override fun releaseSeatAndUpdateBooking(
+        booking: Booking,
+        requestedSeats: Set<String>
+    ): Booking {
+        val show = showService.getShowById(booking.showId)
+
+        for(seat in requestedSeats) {
+            val bookedBy = show?.seats?.get(seat)
+
+            if(bookedBy == booking.bookingId) {
+                show.seats[seat] = null
+            }
+        }
+
+        val currentSeats = booking.bookingSeat
+        var price: Double = booking.bookingPrice
+
+        val (cancelSeats, remainingSeats) = currentSeats.partition { seat -> seat.seatLabel in requestedSeats }
+
+        cancelSeats.forEach { seat ->
+            price -= seat.seatPrice
+        }
+        booking.cancelSeat.addAll(cancelSeats)
+        booking.bookingSeat.clear()
+        booking.bookingSeat.addAll(remainingSeats)
+
+        if(booking.bookingSeat.isEmpty()) {
+            booking.bookingCreatedAt = LocalDateTime.now()
+            booking.bookingStatus = BookingStatus.CANCELLED
+        }
+        return booking
+    }
 
     override fun markSeatAsBooked(
         booked: Booking,

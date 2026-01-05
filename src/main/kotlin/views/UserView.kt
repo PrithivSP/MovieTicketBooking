@@ -14,11 +14,12 @@ import utils.readPasswordForSignUp
 import utils.readString
 
 class UserView {
+
     fun getAuthChoiceView(): NavResult<Int> {
         println("1. Login")
         println("2. SignUp")
         println("0. Exit")
-        return when(val input = readInt("Enter your choice (or 0 to quit): ")) {
+        return when (val input = readInt("Enter your choice (or 0 to quit): ")) {
             0 -> NavResult.Exit
             -1 -> NavResult.Exit
             1, 2 -> NavResult.Result(input)
@@ -33,7 +34,7 @@ class UserView {
         println("1. Login with phone number")
         println("2. Login with email id")
         println("0. Exit")
-        return when(val input = readInt("Enter your choice (or 0 to back): ")) {
+        return when (val input = readInt("Enter your choice (or 0 to back): ")) {
             0 -> NavResult.Back
             -1 -> NavResult.Exit
             1, 2 -> NavResult.Result(input)
@@ -65,6 +66,7 @@ class UserView {
                     ConsoleView.printInputNotValid("age")
                     continue
                 }
+
                 else -> NavResult.Result(age.toByte())
             }
         } while (true)
@@ -91,6 +93,7 @@ class UserView {
                     ConsoleView.printInputNotValid("Email ID")
                     continue
                 }
+
                 else -> {
                     NavResult.Result(emailId)
                 }
@@ -109,6 +112,7 @@ class UserView {
                     ConsoleView.printInputNotValid("Phone Number")
                     continue
                 }
+
                 else -> {
                     NavResult.Result(phoneNumber)
                 }
@@ -144,9 +148,7 @@ class UserView {
         }
     }
 
-    fun showSignUpSuccess() {
-        println("\nSigned up successful. Please proceed with login")
-    }
+    fun showSignUpSuccess() = println("\nSigned up successful. Please proceed with login")
 
     fun showNoUserLoggedIn() {
         println("Please Login to continue...")
@@ -170,16 +172,10 @@ class UserView {
         }
     }
 
-    fun showPasswordDoNotMatch() {
-        println("\nPassword do not match. Try again")
-    }
+    fun showPasswordDoNotMatch() = println("\nPassword do not match. Try again")
 
-    fun showLoginSuccess(userName: String?) {
-        println("\nLogged in. Welcome $userName!")
-    }
+    fun showLoginSuccess(userName: String?) = println("\nLogged in. Welcome $userName!")
 
-    fun showNoBookingsFound() {
-        println("\nNo bookings found for this user")
-    }
+    fun showNoBookingsFound() = println("\nNo bookings found for this user")
 
 }

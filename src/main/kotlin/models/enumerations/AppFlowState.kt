@@ -24,7 +24,7 @@ enum class AppFlowState {
 
     CHANGE_LOCATION,
     SHOW_HISTORY,
-//    CANCEL_BOOKING,
+    CANCEL_BOOKING,
     UPDATE_PROFILE,
 
     EXIT

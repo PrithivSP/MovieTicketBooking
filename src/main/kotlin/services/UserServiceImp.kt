@@ -103,12 +103,10 @@ class UserServiceImp(private val bookingDAO: BookingDAO = BookingDAOImp(), priva
 
     override fun updateUserEmail(userId: String, newEmail: String) {
         userDAO.getUserById(userId)?.userEmail = newEmail
-        TODO("Not yet implemented")
     }
 
     override fun updateUserPhoneNumber(userId: String, newPhoneNumber: String) {
         userDAO.getUserById(userId)?.userPhoneNumber = newPhoneNumber
-        TODO("Not yet implemented")
     }
 
     override fun updateUserLocation(userId: String, newLocation: String) {

@@ -4,6 +4,7 @@ import controllers.exceptions.AuthenticationException
 import models.Booking
 import models.SeatSnapShot
 import models.dtos.BookingDisplay
+import models.dtos.NavResult
 import models.enumerations.BookingStatus
 import services.BookingServiceImp
 import services.UserServiceImp
@@ -60,5 +61,81 @@ class BookingController(
             val bookingDisplay: BookingDisplay =  bookingService.getBookingDisplaySummary(booking)
             bookingView.showHistoryItem(bookingDisplay)
         }
+    }
+
+    fun cancelBooking(userId: String): NavResult<Unit> {
+
+        ConsoleView.printHeader("Cancel Tickets")
+
+        val cancellableBookings =  bookingService.getCancellableBookings(userId)
+        if(cancellableBookings.isEmpty()) {
+            bookingView.showNoCancellableBookings()
+            return NavResult.Back
+        }
+
+        val bookingDisplays = mutableListOf<BookingDisplay>()
+
+        for(booking in cancellableBookings) {
+            val bookingDisplay = bookingService.getBookingDisplaySummary(booking)
+            bookingDisplays.add(bookingDisplay)
+        }
+
+        bookingView.showCancellableBookings(bookingDisplays)
+
+        var chosenBooking: Booking
+
+        do {
+            val cancelChoice: Int = when(val input = bookingView.getCancelBookingChoice()) {
+                NavResult.Back -> return NavResult.Back
+                NavResult.Exit -> return NavResult.Exit
+                is NavResult.Result -> input.result
+
+                NavResult.Retry -> continue
+            }
+
+            if(cancelChoice < 1 || cancelChoice > cancellableBookings.size) {
+                ConsoleView.printInvalidOptions()
+                continue
+            } else {
+                chosenBooking = cancellableBookings[cancelChoice - 1]
+                break
+            }
+
+
+        } while (true)
+
+        // validate
+        var requestedSeats: Set<String>
+        do {
+            requestedSeats = when(val seatInput = bookingView.getSeatCancellationInput()) {
+                NavResult.Back -> return NavResult.Back
+                NavResult.Exit -> return NavResult.Exit
+                is NavResult.Result ->  seatInput.result
+                NavResult.Retry -> continue
+            }
+
+            val bookedSeats = chosenBooking.bookingSeat.map { it.seatLabel }
+
+            val invalidSeats = requestedSeats.filter { seat ->
+                !bookedSeats.contains(seat)
+            }
+
+            if(invalidSeats.isNotEmpty()) {
+                bookingView.showSeatValidationError(invalidSeats.joinToString(" "))
+                continue
+            } else {
+                break
+            }
+        } while (true)
+
+        val updatedBooking = bookingService.releaseSeatAndUpdateBooking(chosenBooking, requestedSeats)
+
+        if(updatedBooking.bookingSeat.isEmpty()) {
+            bookingView.showAllTicketsCancelled()
+        } else {
+            bookingView.showPartialCancellationCompleted()
+        }
+
+        return NavResult.Back
     }
 }

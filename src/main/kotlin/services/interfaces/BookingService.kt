@@ -30,7 +30,7 @@ interface BookingService {
 
     fun getBookingDisplaySummary(booking: Booking): BookingDisplay
 
-//    fun releaseSeatAndUpdateBooking(booking: Booking, requestedSeats: Set<String>): Booking
+    fun releaseSeatAndUpdateBooking(booking: Booking, requestedSeats: Set<String>): Booking
 
     fun markSeatAsBooked(booked: Booking, show: Show, seatSnapShots: List<SeatSnapShot>)
 }

@@ -40,6 +40,8 @@ class AppController {
     fun start() {
         do {
             try {
+
+                // state dispatchers
                 currentFlowState = when (currentFlowState) {
                     AppFlowState.AUTH_MENU -> handleAuthMenu()
                     AppFlowState.LOGIN -> handleLogin()
@@ -51,6 +53,7 @@ class AppController {
                     AppFlowState.SEARCH_MOVIE -> handleSearchMovie()
                     AppFlowState.CHANGE_LOCATION -> handleChangeLocation()
                     AppFlowState.SHOW_HISTORY -> handleShowHistory()
+                    AppFlowState.CANCEL_BOOKING -> handleCancelBooking()
                     AppFlowState.UPDATE_PROFILE -> handleUpdateUserProfile()
 
                     AppFlowState.SELECT_MOVIE -> handleSelectMovie()
@@ -66,9 +69,10 @@ class AppController {
                     AppFlowState.EXIT -> AppFlowState.EXIT
 
                 }
-            } catch (e: ExitApp) {
+
+            } catch (_: ExitApp) {
                 currentFlowState = AppFlowState.AUTH_MENU
-            } catch (e: ExitToUserMenu) {
+            } catch (_: ExitToUserMenu) {
                 currentFlowState = AppFlowState.USER_MENU
             }
 
@@ -77,11 +81,11 @@ class AppController {
         println("End")
     }
 
-    // state dispatchers
+    // state handlers
     private fun handleAuthMenu(): AppFlowState {
         return try {
             userController.showAuthenticationMenu()
-        } catch (e: ExitToUserMenu) {
+        } catch (_: ExitToUserMenu) {
             AppFlowState.AUTH_MENU
         }
     }
@@ -319,6 +323,13 @@ class AppController {
             NavResult.Retry -> AppFlowState.UPDATE_PROFILE
             is NavResult.Result<*> -> AppFlowState.USER_MENU
         }
+    }
+
+    private fun handleCancelBooking(): AppFlowState {
+        val userId = Session.currentUser?.userId ?: return AppFlowState.AUTH_MENU
+
+        bookingController.cancelBooking(userId)
+        return AppFlowState.USER_MENU
     }
 
 }

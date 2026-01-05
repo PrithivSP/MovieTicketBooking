@@ -14,7 +14,7 @@ class MovieView {
     }
 
     fun showMovieDetails(movie: Movie) {
-        println("Movie name       : ${movie.movieName}" )
+        println("\nMovie name       : ${movie.movieName}" )
         println("Certificate      : ${movie.movieEligibility}")
         println("Description      : ${movie.movieDescription}")
         println("Genre            : ${movie.getPrintableGenres()}")
@@ -23,14 +23,14 @@ class MovieView {
         println("Movie Type       : ${movie.movieType}")
 
         if(movie is Movie.ThreeDMovie) {
-            println("Deposit       : ₹${movie.glassDeposit}")
-            println("Converted From 2D: ${if (movie.isConvertedFrom2D) "Yes" else "No"}")
-            println("Motion Sickness: ${if(movie.motionSicknessRisk) "Yes" else "No"}")
+            println("Deposit         : ₹${movie.glassDeposit}")
+            println("Converted From 2D : ${if (movie.isConvertedFrom2D) "Yes" else "No"}")
+            println("Motion Sickness  : ${if(movie.motionSicknessRisk) "Yes" else "No"}")
         }
     }
 
     fun getMovieNameForSearch(): String {
-        return readString("Enter movie name to search (or 0 to go back): ")
+        return readString("\nEnter movie name to search (or 0 to go back): ")
     }
 
     fun showNoMoviesFound() {
@@ -38,6 +38,6 @@ class MovieView {
     }
 
     fun getMovieConfirmationSelection(movieName: String): String {
-        return readString("Confirm your selection \"${movieName}\" (y/n): ")
+        return readString("\nConfirm your selection \"${movieName}\" (y/n): ")
     }
 }

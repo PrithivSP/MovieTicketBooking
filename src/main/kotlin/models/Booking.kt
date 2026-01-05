@@ -10,13 +10,11 @@ class Booking(val bookingId: String,
               val screenId: String,
               val showId: String,
 
-              var bookingSeat: List<SeatSnapShot>,
-              var cancelSeat: List<SeatSnapShot>,
+              var bookingSeat: MutableSet<SeatSnapShot>,
+              var cancelSeat: MutableSet<SeatSnapShot>,
 
               var bookingStatus: BookingStatus,
               var bookingPrice: Double,
 
-              val bookingCreatedAt: LocalDateTime,
-              var bookingCancelledAt: LocalDateTime? ) {
-
-}
+              var bookingCreatedAt: LocalDateTime,
+              var bookingCancelledAt: LocalDateTime? )
