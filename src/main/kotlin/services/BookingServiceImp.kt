@@ -113,6 +113,8 @@ class BookingServiceImp(private val bookingDAO: BookingDAO = BookingDAOImp(),
         booking.bookingSeat.clear()
         booking.bookingSeat.addAll(remainingSeats)
 
+        booking.bookingPrice = price
+
         if(booking.bookingSeat.isEmpty()) {
             booking.bookingCreatedAt = LocalDateTime.now()
             booking.bookingStatus = BookingStatus.CANCELLED
