@@ -6,7 +6,7 @@ import utils.readInt
 
 class TheaterView {
     fun showNoTheaterForMovie(movieName: String) {
-        println("No theaters found for \"$movieName\"")
+        println("\nNo theaters found for \"$movieName\"")
     }
 
     fun showTheatersAndGetChoice(theaters: List<Theater>): Int {

@@ -1,6 +1,7 @@
 package views
 
 import models.Movie
+import models.enumerations.Genre
 import utils.readInt
 import utils.readString
 
@@ -39,5 +40,12 @@ class MovieView {
 
     fun getMovieConfirmationSelection(movieName: String): String {
         return readString("\nConfirm your selection \"${movieName}\" (y/n): ")
+    }
+
+    fun showGenreAndGetChoice(genres: List<Genre>): Int {
+        genres.forEachIndexed { index, genre ->
+            println("${index+1}) ${genre.label}")
+        }
+        return readInt("Enter your choice: ")
     }
 }

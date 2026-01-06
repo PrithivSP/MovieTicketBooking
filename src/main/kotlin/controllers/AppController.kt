@@ -7,6 +7,7 @@ import models.Movie
 import models.Screen
 import models.Show
 import models.enumerations.AppFlowState
+import models.enumerations.Genre
 import services.BookingServiceImp
 import services.interfaces.BookingService
 import views.ShowView
@@ -39,16 +40,20 @@ class AppController {
                     AppFlowState.AUTH_MENU -> handleAuthMenu()
                     AppFlowState.LOGIN -> handleLogin()
                     AppFlowState.SIGNUP -> handleSignUp()
+
                     AppFlowState.USER_MENU -> handleUserMenu()
                     AppFlowState.BROWSE_MOVIES -> handleBrowseMovies()
                     AppFlowState.SEARCH_MOVIE -> handleSearchMovie()
+                    AppFlowState.BROWSE_GENRE -> handleGenre()
                     AppFlowState.CHANGE_LOCATION -> handleChangeLocation()
                     AppFlowState.SHOW_HISTORY -> handleShowHistory()
                     AppFlowState.CANCEL_BOOKING -> handleCancelBooking()
                     AppFlowState.UPDATE_PROFILE -> handleUpdateUserProfile()
+
                     AppFlowState.SELECT_MOVIE -> handleSelectMovie()
                     AppFlowState.SELECT_THEATER_FOR_MOVIE -> handleSelectTheaterForMovie()
                     AppFlowState.SELECT_THEATER -> handleSelectTheater()
+                    AppFlowState.SELECT_THEATER_FOR_GENRE -> handleSelectTheaterForGenre()
                     AppFlowState.SELECT_MOVIE_FOR_THEATER -> handleSelectMovieForTheater()
                     AppFlowState.SELECT_SCREEN -> handleSelectScreen()
                     AppFlowState.SELECT_DATE -> handleSelectDate()
@@ -143,6 +148,21 @@ class AppController {
         val theater = theaterController.chooseTheaterForMovie(selectedMovie, userLocation) ?: run {
             Cache.clearFromTheater()
             return AppFlowState.USER_MENU
+        }
+
+        Cache.selectedTheater = theater
+
+        return AppFlowState.SELECT_SCREEN
+    }
+
+    private fun handleSelectTheaterForGenre(): AppFlowState {
+        val userLocation = Session.currentUser?.userLocation ?: return AppFlowState.AUTH_MENU
+
+        val selectedMovie = Cache.selectedMovie ?: return AppFlowState.BROWSE_GENRE
+
+        val theater = theaterController.chooseTheaterForMovie(selectedMovie, userLocation) ?: run {
+            Cache.clearFromTheater()
+            return AppFlowState.BROWSE_GENRE
         }
 
         Cache.selectedTheater = theater
@@ -288,4 +308,16 @@ class AppController {
         return userController.updateUserProfile(user)
     }
 
+    private fun handleGenre(): AppFlowState {
+        val movie = movieController.chooseMovieFromGenre()
+
+        if( movie == null) {
+            Cache.clearCache()
+            return AppFlowState.USER_MENU
+        }
+
+        Cache.selectedMovie = movie
+
+        return AppFlowState.SELECT_THEATER_FOR_GENRE
+    }
 }

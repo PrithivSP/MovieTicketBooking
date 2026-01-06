@@ -3,6 +3,7 @@ package services
 import daos.MovieDAOImpl
 import daos.interfaces.MovieDAO
 import models.Movie
+import models.enumerations.Genre
 import services.interfaces.MovieService
 
 
@@ -29,6 +30,16 @@ class MovieServiceImp(val movieDAO: MovieDAO = MovieDAOImpl()): MovieService {
             movieDAO.getMovieById(id)?.let {
                 movieList.add(it)
             }
+        }
+
+        return movieList
+    }
+
+    override fun getMoviesForGenre(chosenGenre: Genre): List<Movie> {
+        val movieList = mutableListOf<Movie>()
+
+        movieDAO.getAllMovies().forEach { movie ->
+            if(movie.movieGenres.contains(chosenGenre)) movieList.add(movie)
         }
 
         return movieList

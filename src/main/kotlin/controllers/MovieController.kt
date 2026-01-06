@@ -1,7 +1,9 @@
 package controllers
 
+import controllers.exceptions.ExitToUserMenu
 import models.Movie
 import models.Theater
+import models.enumerations.Genre
 import services.MovieServiceImp
 import services.interfaces.MovieService
 import views.ConsoleView
@@ -48,17 +50,17 @@ class MovieController(
 
             val movieName = movieView.getMovieNameForSearch()
 
-            if(movieName == "0") return null
+            if (movieName == "0") return null
 
             val matchedMovies = movieService.searchMovieByName(movieName)
 
-            if(matchedMovies.isEmpty()) {
+            if (matchedMovies.isEmpty()) {
                 movieView.showNoMoviesFound()
                 continue
             }
             val movieChoice: Int = movieView.showMoviesAndGetChoice(matchedMovies)
 
-            if(movieChoice == 0) {
+            if (movieChoice == 0) {
                 continue
             }
 
@@ -70,7 +72,7 @@ class MovieController(
             val selectedMovie: Movie = matchedMovies[movieChoice - 1]
             val proceed = movieView.getMovieConfirmationSelection(selectedMovie.movieName)
 
-            if(proceed.equals("y", true )|| proceed.equals("yes", true)) {
+            if (proceed.equals("y", true) || proceed.equals("yes", true)) {
                 return selectedMovie
             }
         } while (true)
@@ -79,6 +81,40 @@ class MovieController(
     fun chooseMovieFromTheater(theater: Theater): Movie? {
         val movieList = movieService.getMoviesForTheater(theater.movies)
         return chooseMovieFromList(movieList)
+    }
+
+    fun chooseMovieFromGenre(): Movie? {
+
+        do {
+            var chosenGenre: Genre
+            ConsoleView.printHeader("Choose Genre")
+            val genres = Genre.entries.toList()
+            val genreChoice = movieView.showGenreAndGetChoice(genres)
+
+            if(genreChoice == 0) return null
+            if(genreChoice == -1) throw ExitToUserMenu()
+
+            if(genreChoice < 1 || genreChoice > genres.size) {
+                ConsoleView.printInvalidOptions()
+                continue
+            }
+
+            chosenGenre = genres[genreChoice - 1]
+
+            val movieWithSelectedGenre = movieService.getMoviesForGenre(chosenGenre)
+
+            if(movieWithSelectedGenre.isEmpty()) {
+                movieView.showNoMoviesFound()
+                continue
+            }
+            val chosenMovie = chooseMovieFromList(movieWithSelectedGenre)
+            if(chosenMovie == null) {
+                continue
+            } else {
+                return chosenMovie
+            }
+        } while (true)
+
     }
 
 }
