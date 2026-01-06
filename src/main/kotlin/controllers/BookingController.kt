@@ -1,6 +1,5 @@
 package controllers
 
-import controllers.exceptions.AuthenticationException
 import models.Booking
 import models.SeatSnapShot
 import models.dtos.BookingDisplay
@@ -130,11 +129,14 @@ class BookingController(
 
         val updatedBooking = bookingService.releaseSeatAndUpdateBooking(chosenBooking, requestedSeats)
 
+
         if(updatedBooking.bookingSeat.isEmpty()) {
             bookingView.showAllTicketsCancelled()
         } else {
             bookingView.showPartialCancellationCompleted()
         }
+
+        Cache.totalPrice = updatedBooking.bookingPrice
 
         return NavResult.Back
     }

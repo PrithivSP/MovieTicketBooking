@@ -46,7 +46,7 @@ class BookingView {
             println("Total Price       : ₹%.2f".format(booking.bookingPrice))
         }
 
-        println("Booked At         : ${ booking.bookingCreatedAt?.format(DateTimeFormatter.ofPattern("dd MMM yyyy | hh : mm a")) ?: "N/A"}"
+        println("Booked At         : ${ booking.bookingCreatedAt.format(DateTimeFormatter.ofPattern("dd MMM yyyy | hh : mm a")) ?: "N/A"}"
         )
 
         booking.bookingCancelledAt?.let {

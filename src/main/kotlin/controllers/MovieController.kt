@@ -27,7 +27,7 @@ class MovieController(
                 continue
             }
 
-            val selectedMovie = movies.get(movieChoice - 1)
+            val selectedMovie = movies[movieChoice - 1]
             movieView.showMovieDetails(selectedMovie)
             return selectedMovie
 
@@ -63,8 +63,8 @@ class MovieController(
             }
 
             if (movieChoice < 1 || movieChoice > matchedMovies.size) {
-                ConsoleView.printInvalidOptions();
-                continue;
+                ConsoleView.printInvalidOptions()
+                continue
             }
 
             val selectedMovie: Movie = matchedMovies[movieChoice - 1]

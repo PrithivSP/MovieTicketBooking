@@ -121,13 +121,20 @@ class UserView {
     }
 
     fun getPasswordForSignUp(): NavResult<String> {
-        val password = readPasswordForSignUp("Enter password: ")
+        do {
+            val password = readPasswordForSignUp("Enter password: ")
 
-        return when {
-            password == "-1" -> NavResult.Exit
-            password == "0" -> NavResult.Back
-            else -> NavResult.Result(password)
-        }
+            return when {
+                password == "-1" -> NavResult.Exit
+                password == "0" -> NavResult.Back
+                !password.isValidPassword() -> {
+                    ConsoleView.printInputNotValid("Password")
+                    println("Password should be at least 8 characters")
+                    continue
+                }
+                else -> NavResult.Result(password)
+            }
+        } while (true)
     }
 
     fun getPasswordForLogin(): NavResult<String> {
@@ -150,9 +157,9 @@ class UserView {
 
     fun showSignUpSuccess() = println("\nSigned up successful. Please proceed with login")
 
-    fun showNoUserLoggedIn() {
-        println("Please Login to continue...")
-    }
+//    fun showNoUserLoggedIn() {
+//        println("Please Login to continue...")
+//    }
 
     fun showUpdateMenuAndGetChoice(user: User): NavResult<Int> {
         println("Current details:")
@@ -171,6 +178,8 @@ class UserView {
             else -> NavResult.Result(input)
         }
     }
+
+    fun showUserProfileUpdated() = println("\nUser Profile is updated...")
 
     fun showPasswordDoNotMatch() = println("\nPassword do not match. Try again")
 

@@ -1,7 +1,6 @@
 package views
 
 import models.Screen
-import models.Seat
 import models.SeatSnapShot
 import models.Show
 import models.enumerations.SeatTypes
@@ -9,9 +8,11 @@ import utils.readInt
 import utils.readString
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util.TreeMap
 
 class ShowView() {
+
     fun showNoShowsAvailable() {
         println("No shows available...")
     }
@@ -23,12 +24,13 @@ class ShowView() {
     fun showNoTimesAvailable() {
         println("No Timings available...")
     }
+
     fun showDatesAndGetChoice(dates: List<LocalDate>): Int {
 
         ConsoleView.printHeader("Choose Date")
 
         dates.forEachIndexed { index, date ->
-            println("${index + 1}) $date")
+            println("${index + 1}) ${date.format(DateTimeFormatter.ofPattern("dd MMM yyyy"))}")
         }
 
         return readInt("Enter your choice (or 0 to go back): ")
@@ -45,7 +47,8 @@ class ShowView() {
     }
 
     fun displaySeats(screen: Screen, show: Show) {
-        println("Seat map(X = booked, O = available)")
+        ConsoleView.printHeader("Select Seat")
+        println("\nSeat map(X = booked, O = available)")
         println("Legend: (P)=Premium (C)=Classic (E)=Economy\n")
 
         val rows = TreeMap<String, MutableList<String>>()
@@ -60,7 +63,7 @@ class ShowView() {
         }
 
         for((row, seats) in rows) {
-            print("$row ")
+            print("$row -> ")
 
             for(label in seats) {
 
@@ -79,6 +82,8 @@ class ShowView() {
                 print("$label($typeChar)$mark ")
             }
             println()
+            println()
+
         }
     }
 

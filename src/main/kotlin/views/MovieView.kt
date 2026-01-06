@@ -8,7 +8,7 @@ class MovieView {
     fun showMoviesAndGetChoice(movies: List<Movie>): Int {
         var index = 1
         for(movie in movies) {
-            println("${index++}) ${movie.movieName} | ${movie.getPrintableGenres()} | ${movie.movieDuration} | ${movie.movieLanguage} | ${movie.movieType.type}");
+            println("${index++}) ${movie.movieName} | ${movie.getPrintableGenres()} | ${movie.movieDuration} | ${movie.movieLanguage} | ${movie.movieType.type}")
         }
         return readInt("Enter your movie choice (or 0 to go back): ")
     }
@@ -23,8 +23,8 @@ class MovieView {
         println("Movie Type       : ${movie.movieType}")
 
         if(movie is Movie.ThreeDMovie) {
-            println("Deposit         : ₹${movie.glassDeposit}")
-            println("Converted From 2D : ${if (movie.isConvertedFrom2D) "Yes" else "No"}")
+            println("Deposit           : ₹${movie.glassDeposit}")
+            println("Converted From 2D: ${if (movie.isConvertedFrom2D) "Yes" else "No"}")
             println("Motion Sickness  : ${if(movie.motionSicknessRisk) "Yes" else "No"}")
         }
     }

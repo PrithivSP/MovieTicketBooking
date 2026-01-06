@@ -21,7 +21,7 @@ class TheaterController(
             val theaterChoice: Int = theaterView.showTheatersAndGetChoice(theaters)
 
             // navigation checks
-            if (theaterChoice == 0) return null;
+            if (theaterChoice == 0) return null
             if (theaterChoice == -1) throw ExitToUserMenu()
 
             // input validity checks

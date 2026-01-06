@@ -28,7 +28,7 @@ internal object DataStore {
 
     private fun addSampleData() {
 
-        /* ================= USERS ================= */
+        // ================= USERS =================
         val u1 = User(
             UUID.randomUUID().toString(),
             "Max",
@@ -54,7 +54,7 @@ internal object DataStore {
         users[u1.userId] = u1
         users[u2.userId] = u2
 
-        /* ================= MOVIES ================= */
+        // ================= MOVIES =================
         val m1 = Movie.ThreeDMovie(
             "M1",
             "Inception",
@@ -81,16 +81,16 @@ internal object DataStore {
         movies[m1.movieId] = m1
         movies[m2.movieId] = m2
 
-        /* ================= COMMON VALUES ================= */
+        //================= COMMON VALUES =================
         val today = LocalDate.now()
         val tomorrow = today.plusDays(1)
 
         val theaterMovies = mutableSetOf("M1")
 
-        /* ================= THEATER LOOP ================= */
+        // ================= THEATER LOOP =================
         for (t in 1..3) {
 
-            /* ---------- SEAT TYPE MAPS ---------- */
+            // ---------- SEAT TYPE MAPS ----------
             val seatTypeMap1 = mutableMapOf<String, SeatTypes>()
             val seatTypeMap2 = mutableMapOf<String, SeatTypes>()
 
@@ -104,7 +104,7 @@ internal object DataStore {
                 seatTypeMap2["C$i"] = SeatTypes.ECONOMY
             }
 
-            /* ---------- SCREENS ---------- */
+            // ---------- SCREENS ----------
             val screen1 = Screen("S1", "Screen 1", seatTypeMap1, mutableListOf<String>())
             val screen2 = Screen("S2", "Screen 2", seatTypeMap2, mutableListOf<String>())
 
@@ -113,7 +113,7 @@ internal object DataStore {
                 screen2.screenId to screen2
             )
 
-            /* ---------- THEATER ---------- */
+            // ---------- THEATER ----------
             val theater = Theater(
                 theaterId = "T$t",
                 theaterName = when (t) {
@@ -133,7 +133,8 @@ internal object DataStore {
 
             theaters[theater.theaterId] = theater
 
-            /* ---------- SHOWS (FLATTENED) ---------- */
+            // ---------- SHOWS ----------
+
             val showTimes = listOf(
                 LocalTime.of(10, 0),
                 LocalTime.of(18, 30)

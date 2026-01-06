@@ -6,14 +6,10 @@ import models.Booking
 import models.Movie
 import models.Screen
 import models.Show
-import models.dtos.NavResult
 import models.enumerations.AppFlowState
 import services.BookingServiceImp
-import services.UserServiceImp
 import services.interfaces.BookingService
-import services.interfaces.UserService
 import views.ShowView
-import views.UserView
 
 class AppController {
 
@@ -21,11 +17,9 @@ class AppController {
 
     // --- dependencies ---
     //service
-    private val userService: UserService = UserServiceImp()
     private val bookingService: BookingService = BookingServiceImp()
 
     //view
-    private val userView: UserView = UserView()
     private val showView: ShowView = ShowView()
 
     //controllers
@@ -40,22 +34,18 @@ class AppController {
     fun start() {
         do {
             try {
-
                 // state dispatchers
                 currentFlowState = when (currentFlowState) {
                     AppFlowState.AUTH_MENU -> handleAuthMenu()
                     AppFlowState.LOGIN -> handleLogin()
                     AppFlowState.SIGNUP -> handleSignUp()
-
                     AppFlowState.USER_MENU -> handleUserMenu()
-
                     AppFlowState.BROWSE_MOVIES -> handleBrowseMovies()
                     AppFlowState.SEARCH_MOVIE -> handleSearchMovie()
                     AppFlowState.CHANGE_LOCATION -> handleChangeLocation()
                     AppFlowState.SHOW_HISTORY -> handleShowHistory()
                     AppFlowState.CANCEL_BOOKING -> handleCancelBooking()
                     AppFlowState.UPDATE_PROFILE -> handleUpdateUserProfile()
-
                     AppFlowState.SELECT_MOVIE -> handleSelectMovie()
                     AppFlowState.SELECT_THEATER_FOR_MOVIE -> handleSelectTheaterForMovie()
                     AppFlowState.SELECT_THEATER -> handleSelectTheater()
@@ -65,13 +55,10 @@ class AppController {
                     AppFlowState.SELECT_TIME -> handleSelectTime()
                     AppFlowState.SELECT_SEATS -> handleSelectSeat()
                     AppFlowState.BOOKING -> handleBooking()
-
                     AppFlowState.EXIT -> AppFlowState.EXIT
-
                 }
-
             } catch (_: ExitApp) {
-                currentFlowState = AppFlowState.AUTH_MENU
+                currentFlowState = AppFlowState.EXIT
             } catch (_: ExitToUserMenu) {
                 currentFlowState = AppFlowState.USER_MENU
             }
@@ -91,37 +78,11 @@ class AppController {
     }
 
     private fun handleLogin(): AppFlowState {
-        return when(val result = userController.login()) {
-            NavResult.Back -> AppFlowState.AUTH_MENU
-            NavResult.Exit -> AppFlowState.EXIT
-            NavResult.Retry -> AppFlowState.LOGIN
-
-            is NavResult.Result -> {
-                val user = result.result ?: return AppFlowState.LOGIN
-                Session.login(user)
-                userView.showLoginSuccess(user.userName)
-                AppFlowState.USER_MENU
-            }
-        }
+        return userController.login()
     }
 
     private fun handleSignUp(): AppFlowState {
-        return when (val result = userController.signUp()) {
-
-            NavResult.Back ->
-                AppFlowState.AUTH_MENU
-
-            NavResult.Exit ->
-                AppFlowState.EXIT
-
-            NavResult.Retry ->
-                AppFlowState.SIGNUP
-
-            is NavResult.Result -> {
-                userView.showSignUpSuccess()
-                AppFlowState.AUTH_MENU
-            }
-        }
+        return userController.signUp()
     }
 
     private fun handleUserMenu(): AppFlowState {
@@ -129,9 +90,7 @@ class AppController {
         return browsingController.userMenu()
     }
 
-    private fun handleBrowseMovies(): AppFlowState {
-        return AppFlowState.SELECT_MOVIE
-    }
+    private fun handleBrowseMovies(): AppFlowState = AppFlowState.SELECT_MOVIE
 
     private fun handleSearchMovie(): AppFlowState {
         val searchedMovie = movieController.searchMovie() ?: return AppFlowState.USER_MENU
@@ -157,7 +116,8 @@ class AppController {
     private fun handleSelectMovieForTheater(): AppFlowState {
         val selectedTheater = Cache.selectedTheater ?: return AppFlowState.SELECT_THEATER
 
-        val chosenMovie: Movie = movieController.chooseMovieFromTheater(selectedTheater) ?: return AppFlowState.SELECT_THEATER
+        val chosenMovie: Movie =
+            movieController.chooseMovieFromTheater(selectedTheater) ?: return AppFlowState.SELECT_THEATER
 
         Cache.selectedMovie = chosenMovie
 
@@ -244,7 +204,8 @@ class AppController {
         val selectedTime =
             showController.chooseTimeForShowAndDate(shows, selectedDate) ?: return AppFlowState.SELECT_DATE
 
-        val selectedShow = showController.deriveShow(shows, selectedDate, selectedTime) ?: return AppFlowState.SELECT_TIME
+        val selectedShow =
+            showController.deriveShow(shows, selectedDate, selectedTime) ?: return AppFlowState.SELECT_TIME
 
         Cache.selectedTime = selectedTime
         Cache.selectedShow = selectedShow
@@ -281,8 +242,11 @@ class AppController {
         } else {
             Cache.selectedSeatSnapShots
         }
-        val totalPrice = Cache.totalPrice ?: return AppFlowState.SELECT_TIME
+        val totalPrice = Cache.totalPrice
+
         val userId: String = Session.currentUser?.userId ?: return AppFlowState.AUTH_MENU
+
+
         val booked: Booking? = bookingController.proceedBooking(
             userId,
             selectedMovie.movieId,
@@ -293,7 +257,7 @@ class AppController {
             totalPrice
         )
 
-        if(booked != null) {
+        if (booked != null) {
             bookingService.markSeatAsBooked(booked, selectedShow, selectedSeatSnapShots)
         }
         return AppFlowState.USER_MENU
@@ -302,9 +266,7 @@ class AppController {
     private fun handleChangeLocation(): AppFlowState {
         val userId = Session.currentUser?.userId ?: return AppFlowState.AUTH_MENU
 
-        userController.changeUserLocation(userId)
-
-        return AppFlowState.USER_MENU
+        return userController.changeUserLocation(userId)
     }
 
     private fun handleShowHistory(): AppFlowState {
@@ -315,21 +277,15 @@ class AppController {
         return AppFlowState.USER_MENU
     }
 
-    private fun handleUpdateUserProfile(): AppFlowState {
-        val user = Session.currentUser ?: return AppFlowState.AUTH_MENU
-        return when (userController.updateUserProfile(user)) {
-            NavResult.Back -> AppFlowState.USER_MENU
-            NavResult.Exit -> AppFlowState.USER_MENU
-            NavResult.Retry -> AppFlowState.UPDATE_PROFILE
-            is NavResult.Result<*> -> AppFlowState.USER_MENU
-        }
-    }
-
     private fun handleCancelBooking(): AppFlowState {
         val userId = Session.currentUser?.userId ?: return AppFlowState.AUTH_MENU
-
         bookingController.cancelBooking(userId)
         return AppFlowState.USER_MENU
+    }
+
+    private fun handleUpdateUserProfile(): AppFlowState {
+        val user = Session.currentUser ?: return AppFlowState.AUTH_MENU
+        return userController.updateUserProfile(user)
     }
 
 }
